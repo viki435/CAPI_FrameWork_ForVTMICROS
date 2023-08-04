@@ -1,0 +1,30 @@
+sut:
+  platform_name: fl31ca105gs1404
+  esxi:
+    ip: 10.45.134.133
+    user: root
+    password: intel@123
+    vms:
+      vm1:
+        vm_name: SJ_WithUbuntu_1_EMR
+        vm_username: root
+        vm_password: intel@123
+          #vm2:
+          #vm_name: SJ_WithUbuntu_2_EMR
+          #vm_username: root
+          #vm_password: intel@123
+          #vm3:
+          #vm_name: SJ_WithUbuntu_3_EMR
+          #vm_username: root
+          #vm_password: intel@123
+    datastores:
+      nfs:
+        name: vce_nfs_server
+        nfs_share_path: /var/vce/virtual_machines_repository
+      local_datastore:
+        name: default
+nut:
+  name: fl31ca105gw1401-nw3
+capi_server: 
+  capi_username: vijay.kishore.reddy@intel.com
+  capi_password: 'Siri)436'

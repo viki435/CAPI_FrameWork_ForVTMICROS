@@ -1,0 +1,44 @@
+sut:
+  platform_name: fl31ca105gs1404
+  esxi:
+    ip: 10.45.134.133
+    user: root
+    password: intel@123
+    vms:
+      # loop:
+      #   for: item in [4,5,6]
+      #   do:
+      #     vm4:
+      #       vm_name: SJ_WithUbuntu_VTMicros_${str(attempt)}
+      #       vm_username: root1
+      #       vm_password: intel@123
+      #     #attempt: ${str(attempt)}
+      vm1:
+        vm_name: SJ_WithUbuntu_VTMicros_3
+        vm_username: root1
+        vm_password: intel@123
+          #vm2:
+          #vm_name: SJ_WithUbuntu_VTMicros_4
+          #vm_username: root1
+          #vm_password: intel@123
+          #vm3:
+          #vm_name: SJ_WithUbuntu_VTMicros_5
+          #vm_username: root1
+          #vm_password: intel@123
+    #with_sequence: 1-3
+    datastores:
+      nfs:
+        name: vce_nfs_server_t2
+        nfs_share_path: /var/vce/virtual_machines_repository
+        #nfs_share_path: /var/vce/d02
+      local_datastore:
+        name: default
+  vcenter:
+    ip: 10.223.105.36
+    user: administrator@vsphere.local
+    password: Intel@123
+nut:
+  name: fl31ca105gw1401-nw9
+capi_server: 
+  capi_username: vijay.kishore.reddy@intel.com
+  capi_password: 'Siri)436'

@@ -1,0 +1,27 @@
+sut:
+  platform_name: fl31ca105gs1303
+  esxi:
+    ip: 10.45.134.100
+    user: root
+    password: intel@123
+    vms:
+      vm1:
+        vm_name: SJ_WithUbuntu_VTMicros_DONT_USE_IT_1
+        vm_username: root1
+        vm_password: intel@123
+      
+    datastores:
+      nfs:
+        name: vce_nfs_server
+        nfs_share_path: /var/vce/virtual_machines_repository
+      local_datastore:
+        name: default
+  #vcenter:
+  #  ip: 172.25.223.87
+  #  user: administrator@vsphere.local
+  #  password: Intel@123
+nut:
+  name: fl31ca105gw1401-nw3
+capi_server: 
+  capi_username: vijay.ksihore.reddy@intel.com
+  capi_password: 'Siri)436'
