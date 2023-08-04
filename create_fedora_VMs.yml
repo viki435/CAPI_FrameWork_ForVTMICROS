@@ -1,0 +1,35 @@
+---
+- hosts: 127.0.0.1
+  connection: local
+  gather_facts: no
+  vars:
+    - ansible_python_interpreter: /usr/bin/python3
+  vars_files:
+    - variables.yml
+  tasks:
+    - name: Create Fedora vms using ansible
+      vmware_guest:
+        hostname: "{{vsphere.hostname}}"
+        username: "{{vsphere.username}}"
+        password: "{{vsphere.password}}"
+        validate_certs: no
+        datacenter: "{{vsphere.dcenter}}"
+        name: SJ_WithUbuntu_VTMicros_DONT_USE_IT_{{item}}
+        #guest_id: ubuntu
+        esxi_hostname: "{{vsphere.esxi_host_ip}}"
+        folder: /Flexential_lab/vm
+        template: "{{vsphere.ubuntutemplate}}"
+        datastore: "{{vsphere.datastore}}"
+        # hardware:
+        #    memory_mb: 4096
+        #    num_cpus: 4
+        # networks:
+        #   - name: test_port_group
+        #     device_name: VMXNET 3
+        #     start_connected: yes
+        #     state: new
+        #     connected: true
+        wait_for_ip_address: no
+        state: poweredon
+      with_sequence: 2-9
+      delegate_to: localhost

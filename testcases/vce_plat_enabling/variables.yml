@@ -1,0 +1,22 @@
+---
+vsphere:
+  hostname: '10.223.105.36'
+  username: 'administrator@vsphere.local'
+  password: 'Intel@123'
+  guest: "Fedora"
+  dcenter: "Flexential_Lab"
+  ubuntutemplate: "SJ_WithUbuntu_VTMicros_3"
+  #redhattemplate: "vm_fedora"
+  #windowstemplate: "vm_windows"
+  datastore: "vce_nfs_server_t2"
+  esxi_host_ip: '10.45.134.133'
+  esxi_user_name: "root"
+  esxi_pwd: "intel@123"
+  date_time: "ansible_date_time.epoch"
+  vmwaretools_tools_version: "latest"
+  vmwaretools_yum_server: "https://packages.vmware.com"
+  vmwaretools_yum_path: "/tools"
+  #ovf_path: "http://capi-shell.intel.com/gfs/group/VCE/shared/spec_1_template/mvm2.ovf"
+  #vmachine: "OVF_vm"
+ 
+
