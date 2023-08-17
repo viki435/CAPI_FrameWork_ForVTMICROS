@@ -17,7 +17,7 @@
       username: '{{vsphere.username}}'
       validate_certs: false
       wait_for_ip_address: false
-    with_sequence: 4-14
+    with_sequence: 4-9"
   vars:
   - ansible_python_interpreter: /usr/bin/python3
   vars_files:

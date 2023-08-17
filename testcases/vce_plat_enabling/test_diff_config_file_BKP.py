@@ -76,7 +76,7 @@ class VtCode_Test(BaseContent_Test):
 
         :avocado: tags=demo
         """
-         
+        fileReadFlag=2
         vm_name = self.yaml_configuration['sut']['esxi']['vms']['vm1']['vm_name']
         #vm_name_1 = self.yaml_configuration['sut']['esxi']['vms']['vm2']['vm_name']
         # vm_name_2 = self.yaml_configuration['sut']['esxi']['vms']['vm3']['vm_name']
@@ -102,43 +102,40 @@ class VtCode_Test(BaseContent_Test):
 
         vm_actions = VM_Actions(esxi_ip, esxi_user, esxi_password)
 
+        #self.READ_FROM_FILE = self.params.get("readFromFile", default = None)
+        #print("READ_FROM_FILE value is: ", self.READ_FROM_FILE)
+        #fileReadFlag = self.READ_FROM_FILE
+        #if (fileReadFlag == 0):
+        #    print("READ FROM FILE VALUE IS 0")
+        #elif (fileReadFlag == 1):
+        #    print("READ FROM FILE VALUE IS 1")
+        #else:
+        #    print("Argument read error, fileReadFlag is: ", fileReadFlag)
+        
         self.NUM_VCPUS = self.params.get("numvcpus", default = None)
         self.MEM_SIZE = self.params.get("memSize", default = None)
         self.NODE_AFFINITY = self.params.get("nodeAffinity", default = None)
         self.READ_FROM_FILE = self.params.get("readFromFile", default = None)
-        
         print("***ViKi***In test_diff_config, NUM_VCPUS = ", self.NUM_VCPUS)
         print("***ViKi***In test_diff_config, MEM_SIZE = ", self.MEM_SIZE)
         print("***ViKi***In test_diff_config, NODE_AFFINITY = ", self.NODE_AFFINITY)
-        
+        print("***ViKi***In test_diff_config, READ_FROM_FILE = ", self.READ_FROM_FILE)
         print("Powering Off Base VM to make sure the cloning happens correctly")
-
-
         _logger.info("TestCase.test_demo: init")
-        time.sleep(10)
+        time.sleep(30)
         #if vm_actions.power_on_vm(vm_name) != 0:
-            #print("VM Powering ON failed")
-
+        #print("VM Powering ON failed")
+           
         if vm_actions.power_off_vm(vm_name) != 0:
             print("VM powering OFF failed")
-
-        time.sleep(20)
-
+            time.sleep(20)
         #esxi_ip = self.yaml_configuration['sut']['esxi']['ip'] 
         #esxi_user = self.yaml_configuration['sut']['esxi']['user']
         #esxi_password = self.yaml_configuration['sut']['esxi']['password']
-
-
+           
         esxi_session = SSH(esxi_ip, esxi_user, esxi_password)
-        
         esxi_session.connect()
-                
-                
-        #esxi_session = SmartConnectNoSSL (host=esxi_ip, user=esxi_user, pwd=esxi_password, port=443)
-        #si = SmartConnectNoSSL(host=esxi_ip, user=esxi_user, pwd=esxi_password, port=443)
-        #cmd = 'find / -name ' +  vm_name
-        #stdin, stdout, stderr = esxi_session.connection.exec_command(cmd, timeout=30)
-        #DS_path = /vmfs/volumes/19df80f7-f7c725d3#stdout.read().decode('utf-8').strip().strip(vm_name)
+            
         DS_path = "/vmfs/volumes/19df80f7-f7c725d3"
         vmx_name = vm_name+".vmx"
         config_file_path = DS_path + '/' + vm_name + '/' + vmx_name
@@ -146,22 +143,22 @@ class VtCode_Test(BaseContent_Test):
         esxi_session.scp_remote_to_local(config_file_path)
         location = os.getcwd()
         cmd = 'cp  ' + vmx_name + ' ' +  vmx_name + '.bkp'
-
         os.system(cmd)
         cmd1 = 'mv -f  %s %s'%(vmx_name + '.bkp', vmx_name)
         os.system(cmd1)
         self.log.debug('completed scp_remote_to_local')
         with open(vmx_name, 'r', encoding='utf-8') as fp_Params:
             data = fp_Params.readlines()
-
+                
         print("***ViKi***Number of VCPUs before updating: ", data[6])
         print("***ViKi***Memory Size before updating", data[7])
-
+            
         lineNumber=0
         affinityFlag=0
         lineNumVCPU=300#Setting the value of line number beyond the size of file
         lineNumMemSize=300
         lineNumNodeAffinity=300
+            
         for lineNumber in range(len(data)):
             if ('numvcpus' in data[lineNumber]):
                 print ("Line number matching with numvcpus is: ", lineNumber)
@@ -173,120 +170,80 @@ class VtCode_Test(BaseContent_Test):
                 print("Matching Node Affinity line is found")
                 lineNumNodeAffinity=lineNumber
                 affinityFlag=1
-                
+           
         if (affinityFlag == 1):
             print("Matching Affinity line is found, so just replace the value as per command line")
             tempLine_NA=self.NODE_AFFINITY
             data[lineNumNodeAffinity] = "numa.nodeAffinity ="+" "+'"'+tempLine_NA+'"'+"\n"
             print("Setting the Node Affinity to this in the vmx file: ", data[lineNumNodeAffinity])
-
-        #if affinityFlag == 0:
-        #    print ("Node Affinity parameter is not present in the VMX file, so add it at the end")
-        #    with open(vmx_name, 'a') as fp_nodeAffinity:
-        #        fp_nodeAffinity.write('numa.nodeAffinity = "0"')
-        #print("Check if Node Affinity parameter is added by manually opening the local VMX file now")
+           
         time.sleep(60)
         tempLine6 = self.NUM_VCPUS
         data[6] = "numvcpus ="+" "+'"'+tempLine6+'"'+"\n"
-
+            
         tempLine7 = self.MEM_SIZE
         data[7] = "memSize ="+" "+'"'+tempLine7+'"'+"\n"#"numvcpus ="+" "+"tempLine7"+"\n"
-
+           
         print("***ViKi***After Updating: ", data[6])
         print("***ViKi***After Updating: ", data[7])
         with open(vmx_name, 'w', encoding='utf-8') as fp_Params:
             fp_Params.writelines(data)
-        
-
+            
         if affinityFlag == 0:
             print ("Node Affinity parameter is not present in the VMX file, so add it at the end")
             with open(vmx_name, 'a') as fp_nodeAffinity:
                 fp_nodeAffinity.write('numa.nodeAffinity = "0"')
                 print("Check if Node Affinity parameter is added by manually opening the local VMX file now")
-
+            
         print("CHECK IF THE VARIABLES ARE UPDATED PROPERLY")
-
         time.sleep(20)
 
+        print("THE DATA INDICATING TO READ FROM FILE IS: ", self.READ_FROM_FILE)
 
-
-        #with open(vmx_name, 'r') as fp_mem:
-        #    data = fp_mem.read()
-        #    data_mem = data.replace('memSize = "32768"', 'memSize = "16384"')
-
-        #with open(vmx_name, 'w') as fp_mem:
-        #    fp_mem.write(data_mem)
-
-        #with open(vmx_name, 'r') as fp_vcpu:
-        #    data = fp_vcpu.read()
-        #    data_vcpus = data.replace('numvcpus = "32"', 'numvcpus = "16"')
-
-        #with open(vmx_name, 'w') as fp_vcpu:
-        #    fp_vcpu.write(data_vcpus)
-
-        #with open(vmx_name, 'w+') as lineRemove:
-        #    lines = lineRemove.readlines()
-        #    for line in lines:
-        #        if line.strip('\n') != '"numa.nodeAffinity = "0"':
-        #            lineRemove.write(line)
-        #print("DELETED")
-
-        #with open(vmx_name, 'w+') as lineRem:
-        #    lines = lineRem.readlines()
-        #    for line in lines:
-        #        if line.strip('\n') != 'numa.nodeAffinity = "0"':
-        #            lineRem.write(line)
-        #print("DELETED AGAIN")
-
-        #with open(vmx_name, 'a') as fp_nodeAffinity:
-            #fp_nodeAffinity.write('numa.nodeAffinity = "0"')
-
+        if (self.READ_FROM_FILE == '1'):
+            print("Read the parameters from file")
+            with open(paramsFile.txt, 'r', encoding='utf-8') as fileData:
+                data = fileData.readlines()
+                print("Data in parameters file is: ", data[0])
+                print("Data in parameters file is: ", data[1])
+ 
+        time.sleep(50)
+            
         self.log.debug('completed updating vmx file')
         path = os.getcwd() + "/" + vmx_name
         print("path is: ", path)
         esxi_session.scp_local_to_remote(path, config_file_path)
         self.log.debug('completed scp_local_to_remote')
-
+            
         print("Powering Off the VM after configuring the VMX file of template VM")
-
         if vm_actions.power_off_vm(vm_name) != 0:
             print("VM powering OFF failed")
         time.sleep(20)
-
+            
         if vm_actions.power_on_vm(vm_name) != 0:
             print("VM powering on failed")
         time.sleep(20)
-
+            
         if vm_actions.power_off_vm(vm_name) != 0:
             print("VM powering OFF failed")
         time.sleep(10)
-
-
+            
         #Getting the list of VMs for deleting the already esixting ones.
-
-        vms_list = vm_actions.get_VM_names(vm_name, 4, 5)
+        vms_list = vm_actions.get_VM_names(vm_name, 4, 2)
         print("VMs list before cloning is: ", vms_list)
-
+            
         for VM in vms_list:
             vm_actions.power_off_vm(VM)
             time.sleep(20)
             vm_actions.delete_vm(vc_ip,vc_user,vc_password,VM)
             time.sleep(10)
-        #time.sleep(10)
-
-        print("Giving long delay to delete VM files in NFS share")
-        time.sleep(500)
-
-        ######
-        # cloning number of VMs
-        #########
-        time.sleep(30)
+        
         _logger.info("Calling ansible script")
         os.system("ansible-playbook /root/CAPI_FrameWork_ForVTMICROS/testcases/vce_plat_enabling/create_fedora_VMs.yml")
 
         # - Moved this line up as we needed vm_actions before this: vm_actions = VM_Actions(esxi_ip, esxi_user, esxi_password)
 
-        vms_list = vm_actions.get_VM_names(vm_name, 4, 5)#name, vm starting id, number of VMs
+        vms_list = vm_actions.get_VM_names(vm_name, 4, 2)#name, vm starting id, number of VMs
         vms_list.append(vm_name)
         #list_value=['8','16', '4', '16', '4','16', '2', '12', '2', '12', '4','16', '2', '12', '8', '56', '8','16', '4', '16', '4','16', '2', '12', '2', '12', '4','16', '2', '12', '8', '56', '8','16', '4', '16', '4','16']
         #list_value=['112','224', '16', '224', '56','112', '28', '112']
